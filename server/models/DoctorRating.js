@@ -19,15 +19,43 @@ const DoctorRating = sequelize.define('DoctorRating', {
 });
 
 // Mối quan hệ với User (bệnh nhân đánh giá)
-DoctorRating.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
-User.hasMany(DoctorRating, { foreignKey: 'patientId' });
+DoctorRating.belongsTo(User, {
+    foreignKey: 'patientId',
+    as: 'patient',
+    constraints: false,
+    name: 'fk_doctorrating_patient_id'
+});
+
+User.hasMany(DoctorRating, {
+    foreignKey: 'patientId',
+    constraints: false,
+    name: 'fk_user_doctorratings'
+});
 
 // Mối quan hệ với Doctor
-DoctorRating.belongsTo(Doctor, { foreignKey: 'doctorId' });
-Doctor.hasMany(DoctorRating, { foreignKey: 'doctorId' });
+DoctorRating.belongsTo(Doctor, {
+    foreignKey: 'doctorId',
+    constraints: false,
+    name: 'fk_doctorrating_doctor_id'
+});
+
+Doctor.hasMany(DoctorRating, {
+    foreignKey: 'doctorId',
+    constraints: false,
+    name: 'fk_doctor_ratings'
+});
 
 // Mối quan hệ với Appointment
-DoctorRating.belongsTo(Appointment, { foreignKey: 'appointmentId' });
-Appointment.hasOne(DoctorRating, { foreignKey: 'appointmentId' });
+DoctorRating.belongsTo(Appointment, {
+    foreignKey: 'appointmentId',
+    constraints: false,
+    name: 'fk_doctorrating_appointment_id'
+});
+
+Appointment.hasOne(DoctorRating, {
+    foreignKey: 'appointmentId',
+    constraints: false,
+    name: 'fk_appointment_doctorrating'
+});
 
 module.exports = DoctorRating; 

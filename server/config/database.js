@@ -1,6 +1,7 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
+// Sử dụng mysql2 để hỗ trợ caching_sha2_password
 const sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
@@ -8,9 +9,10 @@ const sequelize = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'mysql',
+        dialectModule: require('mysql2'), // Thêm dòng này để sử dụng mysql2
         logging: false,
         // Thêm cấu hình sử dụng với XAMPP
-        port: 3306, // Port mặc định của MySQL trong XAMPP
+        port: process.env.DB_PORT || 3306, // Port mặc định của MySQL trong XAMPP
         dialectOptions: {
             // Tùy chọn bổ sung nếu cần
         }
@@ -20,7 +22,7 @@ const sequelize = new Sequelize(
 // Kiểm tra kết nối
 sequelize.authenticate()
     .then(() => {
-        console.log('Kết nối thành công đến MySQL thông qua XAMPP');
+        console.log('Kết nối thành công đến MySQL');
     })
     .catch(err => {
         console.error('Không thể kết nối đến cơ sở dữ liệu:', err);

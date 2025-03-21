@@ -13,10 +13,29 @@ const Appointment = sequelize.define('Appointment', {
     }
 });
 
-Appointment.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
-User.hasMany(Appointment, { foreignKey: 'patientId' });
+Appointment.belongsTo(User, {
+    foreignKey: 'patientId',
+    as: 'patient',
+    constraints: false,
+    name: 'fk_appointment_patient_id'
+});
 
-Appointment.belongsTo(Schedule, { foreignKey: 'scheduleId' });
-Schedule.hasOne(Appointment, { foreignKey: 'scheduleId' });
+User.hasMany(Appointment, {
+    foreignKey: 'patientId',
+    constraints: false,
+    name: 'fk_user_appointments'
+});
+
+Appointment.belongsTo(Schedule, {
+    foreignKey: 'scheduleId',
+    constraints: false,
+    name: 'fk_appointment_schedule_id'
+});
+
+Schedule.hasOne(Appointment, {
+    foreignKey: 'scheduleId',
+    constraints: false,
+    name: 'fk_schedule_appointment_id'
+});
 
 module.exports = Appointment;

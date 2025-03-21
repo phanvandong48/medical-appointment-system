@@ -25,7 +25,16 @@ const MedicalFile = sequelize.define('MedicalFile', {
     }
 });
 
-MedicalFile.belongsTo(MedicalRecordDetail, { foreignKey: 'recordDetailId' });
-MedicalRecordDetail.hasMany(MedicalFile, { foreignKey: 'recordDetailId' });
+MedicalFile.belongsTo(MedicalRecordDetail, {
+    foreignKey: 'recordDetailId',
+    constraints: false,
+    name: 'fk_medicalfile_recorddetail_id'
+});
+
+MedicalRecordDetail.hasMany(MedicalFile, {
+    foreignKey: 'recordDetailId',
+    constraints: false,
+    name: 'fk_recorddetail_files'
+});
 
 module.exports = MedicalFile;

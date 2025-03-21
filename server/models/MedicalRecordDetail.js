@@ -21,13 +21,40 @@ const MedicalRecordDetail = sequelize.define('MedicalRecordDetail', {
     }
 });
 
-MedicalRecordDetail.belongsTo(MedicalRecord, { foreignKey: 'recordId' });
-MedicalRecord.hasMany(MedicalRecordDetail, { foreignKey: 'recordId' });
+MedicalRecordDetail.belongsTo(MedicalRecord, {
+    foreignKey: 'recordId',
+    constraints: false,
+    name: 'fk_recorddetail_record_id'
+});
 
-MedicalRecordDetail.belongsTo(Appointment, { foreignKey: 'appointmentId' });
-Appointment.hasOne(MedicalRecordDetail, { foreignKey: 'appointmentId' });
+MedicalRecord.hasMany(MedicalRecordDetail, {
+    foreignKey: 'recordId',
+    constraints: false,
+    name: 'fk_record_details'
+});
 
-MedicalRecordDetail.belongsTo(Doctor, { foreignKey: 'doctorId' });
-Doctor.hasMany(MedicalRecordDetail, { foreignKey: 'doctorId' });
+MedicalRecordDetail.belongsTo(Appointment, {
+    foreignKey: 'appointmentId',
+    constraints: false,
+    name: 'fk_recorddetail_appointment_id'
+});
+
+Appointment.hasOne(MedicalRecordDetail, {
+    foreignKey: 'appointmentId',
+    constraints: false,
+    name: 'fk_appointment_recorddetail'
+});
+
+MedicalRecordDetail.belongsTo(Doctor, {
+    foreignKey: 'doctorId',
+    constraints: false,
+    name: 'fk_recorddetail_doctor_id'
+});
+
+Doctor.hasMany(MedicalRecordDetail, {
+    foreignKey: 'doctorId',
+    constraints: false,
+    name: 'fk_doctor_recorddetails'
+});
 
 module.exports = MedicalRecordDetail;

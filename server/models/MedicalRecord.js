@@ -12,7 +12,17 @@ const MedicalRecord = sequelize.define('MedicalRecord', {
     }
 });
 
-MedicalRecord.belongsTo(User, { foreignKey: 'patientId', as: 'patient' });
-User.hasMany(MedicalRecord, { foreignKey: 'patientId' });
+MedicalRecord.belongsTo(User, {
+    foreignKey: 'patientId',
+    as: 'patient',
+    constraints: false,
+    name: 'fk_medicalrecord_patient_id'
+});
+
+User.hasMany(MedicalRecord, {
+    foreignKey: 'patientId',
+    constraints: false,
+    name: 'fk_user_medicalrecords'
+});
 
 module.exports = MedicalRecord;

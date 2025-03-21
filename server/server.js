@@ -39,8 +39,11 @@ async function startServer() {
         await sequelize.authenticate();
         console.log('Kết nối database thành công');
 
-        // Sync models with database
-        await sequelize.sync();
+        // Sync models with database with altered option to handle foreign key constraints
+        await sequelize.sync({
+            alter: true,  // Cho phép thay đổi cấu trúc bảng nếu cần
+            force: false  // Không xóa dữ liệu hiện có
+        });
         console.log('Đồng bộ models thành công');
 
         app.listen(PORT, () => {
