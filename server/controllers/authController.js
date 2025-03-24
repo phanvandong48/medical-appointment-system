@@ -26,11 +26,15 @@ exports.register = async (req, res) => {
 
         // Nếu là bác sĩ, tạo thông tin bác sĩ
         if (role === 'doctor') {
+            // Lấy đường dẫn file nếu có upload
+            const profileImage = req.file ? `/uploads/${req.file.filename}` : null;
+
             await Doctor.create({
                 userId: user.id,
                 specialization,
                 experience,
-                description
+                description,
+                profileImage
             });
         }
 

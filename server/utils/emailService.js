@@ -23,8 +23,8 @@ const emailService = {
                     <li><strong>Trạng thái:</strong> Chờ xác nhận</li>
                 </ul>
                 <p>Vui lòng đến trước 15 phút để hoàn thành thủ tục.</p>
-                <p>Nếu bạn cần thay đổi hoặc hủy lịch, vui lòng đăng nhập vào hệ thống hoặc liên hệ với chúng tôi qua số điện thoại: <strong>0123456789</strong></p>
-                <p>Trân trọng,<br>Phòng khám XYZ</p>
+                <p>Nếu bạn cần thay đổi hoặc hủy lịch, vui lòng đăng nhập vào hệ thống hoặc liên hệ với chúng tôi qua số điện thoại: <strong>0888460408</strong></p>
+                <p>Trân trọng,<br>Phòng khám MedCare</p>
             `
         };
 
@@ -57,7 +57,7 @@ const emailService = {
                     <li><strong>Lý do khám:</strong> ${appointment.reason}</li>
                 </ul>
                 <p>Vui lòng đăng nhập vào hệ thống để xác nhận hoặc quản lý lịch hẹn này.</p>
-                <p>Trân trọng,<br>Hệ thống Phòng khám XYZ</p>
+                <p>Trân trọng,<br>Hệ thống Phòng khám MedCare</p>
             `
         };
 
@@ -88,7 +88,7 @@ const emailService = {
                     <li><strong>Thời gian:</strong> ${schedule.startTime} - ${schedule.endTime}</li>
                 </ul>
                 <p>Nếu bạn muốn đặt lịch mới, vui lòng đăng nhập vào hệ thống hoặc liên hệ với chúng tôi.</p>
-                <p>Trân trọng,<br>Phòng khám XYZ</p>
+                <p>Trân trọng,<br>Phòng khám MedCare</p>
             `
         };
 
@@ -106,7 +106,7 @@ const emailService = {
                     <li><strong>Ngày khám:</strong> ${new Date(schedule.date).toLocaleDateString('vi-VN')}</li>
                     <li><strong>Thời gian:</strong> ${schedule.startTime} - ${schedule.endTime}</li>
                 </ul>
-                <p>Trân trọng,<br>Hệ thống Phòng khám XYZ</p>
+                <p>Trân trọng,<br>Hệ thống Phòng khám MedCare</p>
             `
         };
 
@@ -138,8 +138,8 @@ const emailService = {
                     <li><strong>Thời gian:</strong> ${schedule.startTime} - ${schedule.endTime}</li>
                 </ul>
                 <p>Vui lòng đến trước 15 phút để hoàn thành thủ tục.</p>
-                <p>Nếu bạn cần thay đổi hoặc hủy lịch, vui lòng đăng nhập vào hệ thống hoặc liên hệ với chúng tôi qua số điện thoại: <strong>0123456789</strong></p>
-                <p>Trân trọng,<br>Phòng khám XYZ</p>
+                <p>Nếu bạn cần thay đổi hoặc hủy lịch, vui lòng đăng nhập vào hệ thống hoặc liên hệ với chúng tôi qua số điện thoại: <strong>0888460408</strong></p>
+                <p>Trân trọng,<br>Phòng khám MedCare</p>
             `
         };
 
