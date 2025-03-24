@@ -24,6 +24,18 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Cấu hình session trước khi sử dụng routes
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'medical-app-secret-key',  // Thêm secret key
+    resave: false,                                                  // Thêm tùy chọn resave
+    saveUninitialized: false,                                       // Thêm tùy chọn saveUninitialized
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',              // Chỉ bật secure trong production
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Cấu hình sameSite phù hợp
+        maxAge: 24 * 60 * 60 * 1000                                // 1 ngày
+    }
+}));
+
 // Phục vụ files tĩnh
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -35,17 +47,6 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/medical-records', medicalRecordRoutes);
 app.use('/api/ratings', ratingRoutes);
-
-// Cập nhật tùy chọn cookie
-app.use(session({
-    // ...các config khác
-    cookie: {
-        secure: true, // Đặt true nếu sử dụng HTTPS
-        sameSite: 'none', // Quan trọng cho cross-origin requests
-        domain: '.vercel.app', // Tùy chọn
-        maxAge: 24 * 60 * 60 * 1000 // 1 ngày
-    }
-}));
 
 // Thêm CORS headers trực tiếp
 app.use((req, res, next) => {
