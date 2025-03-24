@@ -16,23 +16,42 @@ const ratingRoutes = require('./routes/ratingRoutes');
 
 const app = express();
 
-// Middleware
+// Xác định môi trường hiện tại
+const isProduction = process.env.NODE_ENV === 'production';
+console.log(`Môi trường hiện tại: ${isProduction ? 'production' : 'development'}`);
+
+// Cấu hình CORS dựa trên môi trường
+const allowedOrigins = isProduction
+    ? ['https://medical-frontend-six.vercel.app', 'https://your-other-production-domain.com']
+    : ['http://localhost:3000'];
+
 app.use(cors({
-    origin: '*',  // Trong môi trường phát triển, bạn có thể cho phép tất cả origins
+    origin: function (origin, callback) {
+        // Cho phép yêu cầu không có origin (như mobile apps, curl, postman)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1 || !isProduction) {
+            callback(null, true);
+        } else {
+            callback(new Error('Bị chặn bởi CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
+
 app.use(express.json());
 
 // Cấu hình session trước khi sử dụng routes
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'medical-app-secret-key',  // Thêm secret key
-    resave: false,                                                  // Thêm tùy chọn resave
-    saveUninitialized: false,                                       // Thêm tùy chọn saveUninitialized
+    secret: process.env.SESSION_SECRET || 'medical-app-secret-key',
+    resave: false,
+    saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production',              // Chỉ bật secure trong production
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Cấu hình sameSite phù hợp
-        maxAge: 24 * 60 * 60 * 1000                                // 1 ngày
+        secure: isProduction, // Chỉ bật secure trong production
+        sameSite: isProduction ? 'none' : 'lax', // Cấu hình sameSite phù hợp
+        maxAge: 24 * 60 * 60 * 1000 // 1 ngày
     }
 }));
 
@@ -48,12 +67,11 @@ app.use('/api/schedules', scheduleRoutes);
 app.use('/api/medical-records', medicalRecordRoutes);
 app.use('/api/ratings', ratingRoutes);
 
-// Thêm CORS headers trực tiếp
+// Thêm CORS headers trực tiếp cho các trường hợp đặc biệt
 app.use((req, res, next) => {
     const origin = req.headers.origin;
-    if (origin === 'https://medical-frontend-six.vercel.app' ||
-        origin === 'http://localhost:3000') {
-        res.setHeader('Access-Control-Allow-Origin', origin);
+    if (allowedOrigins.includes(origin) || !isProduction) {
+        res.setHeader('Access-Control-Allow-Origin', origin || '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -72,6 +90,11 @@ app.use((req, res, next) => {
     next();
 });
 
+// Thêm route health check cho Railway
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
+
 // Database connection and server start
 const PORT = process.env.PORT || 5000;
 
@@ -87,18 +110,28 @@ async function startServer() {
         });
         console.log('Đồng bộ models thành công');
 
-        app.listen(PORT, () => {
+        app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server đang chạy tại http://localhost:${PORT}`);
+            console.log(`Trong môi trường: ${isProduction ? 'production' : 'development'}`);
         });
     } catch (error) {
         console.error('Không thể kết nối đến database:', error);
 
         // Start server anyway even if database connection fails
-        app.listen(PORT, () => {
+        app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server đang chạy tại http://localhost:${PORT} (Không có kết nối database)`);
             console.log('Hãy đảm bảo MySQL/XAMPP đang chạy và thử lại');
         });
     }
 }
+
+// Xử lý các lỗi không bắt được
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (error) => {
+    console.error('Unhandled Rejection:', error);
+});
 
 startServer();  
