@@ -23,6 +23,8 @@ const MedicalFile = sequelize.define('MedicalFile', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
     }
+}, {
+    tableName: 'Medicalfiles'
 });
 
 MedicalFile.belongsTo(MedicalRecordDetail, {

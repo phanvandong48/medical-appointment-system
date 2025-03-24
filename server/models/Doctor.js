@@ -13,6 +13,9 @@ const Doctor = sequelize.define('Doctor', {
     description: {
         type: DataTypes.TEXT
     }
+
+}, {
+    tableName: 'Doctors'
 });
 
 Doctor.belongsTo(User, {

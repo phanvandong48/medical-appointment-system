@@ -10,6 +10,8 @@ const MedicalRecord = sequelize.define('MedicalRecord', {
     description: {
         type: DataTypes.TEXT
     }
+}, {
+    tableName: 'Medicalrecords'
 });
 
 MedicalRecord.belongsTo(User, {

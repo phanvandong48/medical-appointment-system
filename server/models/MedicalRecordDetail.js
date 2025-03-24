@@ -19,6 +19,8 @@ const MedicalRecordDetail = sequelize.define('MedicalRecordDetail', {
         type: DataTypes.DATEONLY,
         allowNull: false
     }
+}, {
+    tableName: 'Medicalrecorddetails'
 });
 
 MedicalRecordDetail.belongsTo(MedicalRecord, {

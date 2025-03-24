@@ -11,6 +11,8 @@ const Appointment = sequelize.define('Appointment', {
         type: DataTypes.ENUM('pending', 'confirmed', 'canceled', 'completed'),
         defaultValue: 'pending'
     }
+}, {
+    tableName: 'Appointments'
 });
 
 Appointment.belongsTo(User, {

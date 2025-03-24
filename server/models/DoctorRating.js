@@ -16,6 +16,8 @@ const DoctorRating = sequelize.define('DoctorRating', {
     comment: {
         type: DataTypes.TEXT
     }
+}, {
+    tableName: 'Doctorratings'
 });
 
 // Mối quan hệ với User (bệnh nhân đánh giá)

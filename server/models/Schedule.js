@@ -19,6 +19,8 @@ const Schedule = sequelize.define('Schedule', {
         type: DataTypes.ENUM('available', 'booked'),
         defaultValue: 'available'
     }
+}, {
+    tableName: 'Schedules'
 });
 
 Schedule.belongsTo(Doctor, {
