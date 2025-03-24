@@ -3,6 +3,7 @@ const cors = require('cors');
 const sequelize = require('./config/database');
 const path = require('path');
 require('dotenv').config();
+const session = require('express-session');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -17,13 +18,9 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'https://medical-appointment-frontend.vercel.app',
-        'https://medical-appointment-frontend-d3oc.vercel.app'
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
+    origin: '*',  // Trong môi trường phát triển, bạn có thể cho phép tất cả origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
@@ -38,6 +35,41 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/medical-records', medicalRecordRoutes);
 app.use('/api/ratings', ratingRoutes);
+
+// Cập nhật tùy chọn cookie
+app.use(session({
+    // ...các config khác
+    cookie: {
+        secure: true, // Đặt true nếu sử dụng HTTPS
+        sameSite: 'none', // Quan trọng cho cross-origin requests
+        domain: '.vercel.app', // Tùy chọn
+        maxAge: 24 * 60 * 60 * 1000 // 1 ngày
+    }
+}));
+
+// Thêm CORS headers trực tiếp
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin === 'https://medical-frontend-six.vercel.app' ||
+        origin === 'http://localhost:3000') {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    next();
+});
+
+// Log tất cả requests để debug
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
 
 // Database connection and server start
 const PORT = process.env.PORT || 5000;
