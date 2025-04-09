@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Doctor = require('../models/Doctor');
 const Schedule = require('../models/Schedule');
+const DoctorRating = require('../models/DoctorRating');
+const sequelize = require('../config/database');
 const { Op } = require('sequelize');
 
 exports.getAllDoctors = async (req, res) => {
@@ -10,12 +12,42 @@ exports.getAllDoctors = async (req, res) => {
                 {
                     model: User,
                     attributes: ['id', 'fullName', 'email', 'phoneNumber']
+                },
+                {
+                    model: DoctorRating,
+                    attributes: [],
+                    required: false
                 }
-            ]
+            ],
+            attributes: {
+                include: [
+                    [
+                        sequelize.fn('COALESCE', sequelize.fn('AVG', sequelize.col('DoctorRatings.rating')), 0),
+                        'averageRating'
+                    ],
+                    [
+                        sequelize.fn('COUNT', sequelize.col('DoctorRatings.id')),
+                        'ratingsCount'
+                    ]
+                ]
+            },
+            group: ['Doctor.id', 'User.id']
         });
 
-        res.status(200).json(doctors);
+        // Chuyển đổi kết quả để đảm bảo định dạng số đúng
+        const formattedDoctors = doctors.map(doctor => {
+            const plainDoctor = doctor.get({ plain: true });
+
+            // Đảm bảo định dạng số cho averageRating
+            plainDoctor.averageRating = plainDoctor.averageRating ?
+                parseFloat(plainDoctor.averageRating).toFixed(1) : '0.0';
+
+            return plainDoctor;
+        });
+
+        res.status(200).json(formattedDoctors);
     } catch (error) {
+        console.error('Error fetching doctors:', error);
         res.status(400).json({
             success: false,
             message: error.message
@@ -30,8 +62,30 @@ exports.getDoctorById = async (req, res) => {
                 {
                     model: User,
                     attributes: ['id', 'fullName', 'email', 'phoneNumber']
+                },
+                {
+                    model: DoctorRating,
+                    required: false,
+                    include: [{
+                        model: User,
+                        as: 'patient',
+                        attributes: ['fullName']
+                    }]
                 }
-            ]
+            ],
+            attributes: {
+                include: [
+                    [
+                        sequelize.fn('COALESCE', sequelize.fn('AVG', sequelize.col('DoctorRatings.rating')), 0),
+                        'averageRating'
+                    ],
+                    [
+                        sequelize.fn('COUNT', sequelize.col('DoctorRatings.id')),
+                        'ratingsCount'
+                    ]
+                ]
+            },
+            group: ['Doctor.id', 'User.id', 'DoctorRatings.id', 'DoctorRatings->patient.id']
         });
 
         if (!doctor) {
@@ -41,8 +95,14 @@ exports.getDoctorById = async (req, res) => {
             });
         }
 
-        res.status(200).json(doctor);
+        // Format đánh giá trung bình thành số thập phân
+        const plainDoctor = doctor.get({ plain: true });
+        plainDoctor.averageRating = plainDoctor.averageRating ?
+            parseFloat(plainDoctor.averageRating).toFixed(1) : '0.0';
+
+        res.status(200).json(plainDoctor);
     } catch (error) {
+        console.error('Error fetching doctor details:', error);
         res.status(400).json({
             success: false,
             message: error.message

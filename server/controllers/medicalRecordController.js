@@ -141,7 +141,12 @@ exports.createMedicalRecord = async (req, res) => {
 exports.addRecordDetail = async (req, res) => {
     try {
         const { recordId } = req.params;
-        const { diagnosis, prescription, notes, recordDate, appointmentId } = req.body;
+        const { diagnosis, prescription, notes, recordDate } = req.body;
+
+        // Xử lý appointmentId - chuyển chuỗi rỗng thành null
+        const appointmentId = req.body.appointmentId && req.body.appointmentId.trim() !== ''
+            ? req.body.appointmentId
+            : null;
 
         const record = await MedicalRecord.findByPk(recordId);
 
@@ -181,9 +186,20 @@ exports.addRecordDetail = async (req, res) => {
             });
         }
 
+        // Kiểm tra appointmentId có tồn tại không (nếu có)
+        if (appointmentId !== null) {
+            const appointment = await Appointment.findByPk(appointmentId);
+            if (!appointment) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Cuộc hẹn không tồn tại'
+                });
+            }
+        }
+
         const recordDetail = await MedicalRecordDetail.create({
             recordId,
-            appointmentId,
+            appointmentId, // Đã được xử lý thành null hoặc ID hợp lệ
             doctorId,
             diagnosis,
             prescription,
@@ -196,9 +212,10 @@ exports.addRecordDetail = async (req, res) => {
             data: recordDetail
         });
     } catch (error) {
-        res.status(400).json({
+        console.error('Lỗi khi thêm chi tiết bệnh án:', error);
+        res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Lỗi server: ' + error.message
         });
     }
 };
