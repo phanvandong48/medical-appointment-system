@@ -134,4 +134,13 @@ process.on('unhandledRejection', (error) => {
     console.error('Unhandled Rejection:', error);
 });
 
-startServer();  
+startServer();
+
+app.get('/', (req, res) => {
+    res.send('API đang chạy ngon lành nè!');
+});
+
+app.use((req, res, next) => {
+    console.log(`🔍 Request: ${req.method} ${req.url}`);
+    next();
+});
